@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel administrativo | TransMaquinaria</title>
+  <link rel="stylesheet" href="/css/estilos.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============================ MENÚ LATERAL ============================ -->
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-logo">TM</div>
+        <div>
+          <p class="marca-titulo">TransMaquinaria</p>
+          <p class="marca-subtitulo">Panel administrativo</p>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item activo" data-vista="tablero">Tablero</button>
+        <button class="menu-item" data-vista="flota">Flota</button>
+        <button class="menu-item" data-vista="operacion">Nueva operación</button>
+        <button class="menu-item" data-vista="historial">Historial</button>
+        <button class="menu-item" data-vista="navieras">Navieras</button>
+        <button class="menu-item solo-admin oculto" data-vista="administracion">Administración</button>
+      </nav>
+
+      <div class="menu-pie">
+        <div class="usuario-caja">
+          <div class="usuario-avatar" id="usuario-avatar">?</div>
+          <div class="usuario-datos">
+            <p class="usuario-nombre" id="usuario-nombre">—</p>
+            <p class="usuario-rol" id="usuario-rol">—</p>
+          </div>
+        </div>
+        <button class="boton salir" id="boton-salir">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <!-- ============================ CONTENIDO ============================ -->
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1 id="encabezado-titulo">Tablero</h1>
+          <p class="encabezado-sub" id="encabezado-sub">Indicadores generales de la operación</p>
+        </div>
+        <span class="estado" id="estado-servidor"><i></i> Conectando…</span>
+      </header>
+
+      <div id="aviso" class="aviso oculto"></div>
+
+      <!-- ---------------------------- TABLERO ---------------------------- -->
+      <section class="vista" id="vista-tablero">
+        <div class="tarjetas">
+          <article class="tarjeta kpi"><p class="kpi-titulo">Vehículos en flota</p><p class="kpi-valor" id="kpi-vehiculos">—</p></article>
+          <article class="tarjeta kpi"><p class="kpi-titulo">Operaciones registradas</p><p class="kpi-valor" id="kpi-operaciones">—</p></article>
+          <article class="tarjeta kpi"><p class="kpi-titulo">Operaciones internacionales</p><p class="kpi-valor" id="kpi-internacionales">—</p></article>
+          <article class="tarjeta kpi"><p class="kpi-titulo">Facturado total</p><p class="kpi-valor" id="kpi-facturado">—</p></article>
+        </div>
+
+        <div class="rejilla-dos">
+          <article class="tarjeta"><h2>Flota por categoría</h2><div id="grafico-flota" class="grafico"></div></article>
+          <article class="tarjeta"><h2>Tipo de operación</h2><div id="grafico-operaciones" class="grafico"></div></article>
+        </div>
+
+        <article class="tarjeta">
+          <h2>Reglas de negocio</h2>
+          <ul class="reglas">
+            <li><strong>Origen</strong> en Santa Marta, Barranquilla, Cartagena o Buenaventura → <span class="etiqueta imp">Importación</span> (se asignan 3 navieras del puerto).</li>
+            <li><strong>Destino</strong> en esos puertos → <span class="etiqueta exp">Exportación</span> (se asignan 3 navieras del puerto).</li>
+            <li>Ruta sin esos puertos → <span class="etiqueta nac">Transporte nacional</span> (sin trámites de importación/exportación).</li>
+          </ul>
+          <p class="puertos" id="puertos-habilitados"></p>
+        </article>
+      </section>
+
+      <!-- ----------------------------- FLOTA ----------------------------- -->
+      <section class="vista oculto" id="vista-flota">
+        <article class="tarjeta">
+          <div class="tarjeta-cabecera">
+            <h2>Vehículos y transportistas</h2>
+            <div class="filtros">
+              <input type="search" id="filtro-flota" placeholder="Buscar placa, nombre o cédula…" />
+              <select id="filtro-tipo-vehiculo">
+                <option value="">Todas las categorías</option>
+                <option value="TURBO">Turbo</option>
+                <option value="CAMION SENCILLO">Camión sencillo</option>
+                <option value="TRACTOCAMION">Tractocamión</option>
+              </select>
+            </div>
+          </div>
+          <div class="tabla-scroll">
+            <table class="tabla">
+              <thead>
+                <tr><th>Placa</th><th>Tipo de vehículo</th><th>Capacidad</th><th>Tarifa base</th>
+                <th>Transportista</th><th>Cédula</th><th>Teléfono</th><th>Licencia</th><th>Año</th></tr>
+              </thead>
+              <tbody id="cuerpo-flota"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- -------------------------- NUEVA OPERACIÓN -------------------------- -->
+      <section class="vista oculto" id="vista-operacion">
+        <div class="rejilla-dos">
+          <article class="tarjeta">
+            <h2>Registrar operación de transporte</h2>
+            <form id="formulario-operacion" class="formulario">
+              <label>Vehículo (placa)<select id="op-placa" required></select></label>
+
+              <div class="rejilla-dos-bis">
+                <label>Origen<input id="op-origen" list="ciudades" placeholder="Ej. Cartagena" required /></label>
+                <label>Destino<input id="op-destino" list="ciudades" placeholder="Ej. Bogotá" required /></label>
+              </div>
+              <datalist id="ciudades">
+                <option value="Bogotá"></option><option value="Medellín"></option>
+                <option value="Cali"></option><option value="Bucaramanga"></option>
+                <option value="Cúcuta"></option><option value="Ibagué"></option>
+                <option value="Santa Marta"></option><option value="Barranquilla"></option>
+                <option value="Cartagena"></option><option value="Buenaventura"></option>
+              </datalist>
+
+              <p class="ruta-clasificada" id="ruta-clasificada">Clasificación de la ruta: <em>se completa al elegir origen y destino</em></p>
+
+              <label>Tipo de carga
+                <select id="op-tipo-carga" required>
+                  <option value="Maquinaria amarilla">Maquinaria amarilla</option>
+                  <option value="Repuestos e insumos">Repuestos e insumos</option>
+                  <option value="Vehículo por sus propios medios">Vehículo por sus propios medios</option>
+                  <option value="Vehículo cargado">Vehículo cargado</option>
+                </select>
+              </label>
+
+              <div class="rejilla-dos-bis">
+                <label>Peso (toneladas)<input type="number" id="op-peso" min="0" step="0.1" value="0" /></label>
+                <label class="check"><input type="checkbox" id="op-extradimensionada" /> Carga extradimensionada</label>
+              </div>
+
+              <label>Descripción de la carga<input id="op-descripcion" placeholder="Ej. Bulldozer importado" /></label>
+
+              <div class="acciones">
+                <button type="button" class="boton secundario" id="boton-simular">Simular</button>
+                <button type="submit" class="boton primario" id="boton-registrar">Registrar operación</button>
+              </div>
+            </form>
+          </article>
+
+          <article class="tarjeta">
+            <h2>Resultado</h2>
+            <div id="resultado-operacion" class="resultado">
+              <p class="vacio">Simula o registra una operación para ver la documentación, las navieras asignadas y los costos.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ---------------------------- HISTORIAL ---------------------------- -->
+      <section class="vista oculto" id="vista-historial">
+        <article class="tarjeta">
+          <div class="tarjeta-cabecera">
+            <h2>Operaciones registradas</h2>
+            <button class="boton secundario" id="boton-refrescar-historial">Refrescar</button>
+          </div>
+          <div class="tabla-scroll">
+            <table class="tabla">
+              <thead>
+                <tr><th>#</th><th>Fecha</th><th>Placa</th><th>Tipo</th><th>Transportista</th>
+                <th>Origen → Destino</th><th>Carga</th><th>Peso</th><th>Naviera</th><th>Costo total</th></tr>
+              </thead>
+              <tbody id="cuerpo-historial"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ----------------------------- NAVIERAS ----------------------------- -->
+      <section class="vista oculto" id="vista-navieras">
+        <div class="rejilla-navieras" id="rejilla-navieras"></div>
+      </section>
+
+      <!-- --------------------------- ADMINISTRACIÓN --------------------------- -->
+      <section class="vista oculto" id="vista-administracion">
+        <div class="rejilla-dos">
+          <article class="tarjeta">
+            <h2>Usuarios del sistema</h2>
+            <div class="tabla-scroll">
+              <table class="tabla">
+                <thead><tr><th>#</th><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Último acceso</th></tr></thead>
+                <tbody id="cuerpo-usuarios"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="tarjeta">
+            <h2>Intentos de inicio de sesión</h2>
+            <div class="tabla-scroll tabla-alta">
+              <table class="tabla">
+                <thead><tr><th>Correo</th><th>Resultado</th><th>IP</th><th>Fecha</th></tr></thead>
+                <tbody id="cuerpo-intentos"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+
+        <article class="tarjeta">
+          <h2>Bitácora de auditoría</h2>
+          <div class="tabla-scroll">
+            <table class="tabla">
+              <thead><tr><th>#</th><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th><th>IP</th></tr></thead>
+              <tbody id="cuerpo-auditoria"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
