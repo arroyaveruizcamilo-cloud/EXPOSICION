@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: exposicion-transporte
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.8
+      - key: TM_SECRET_KEY
+        generateValue: true
+      - key: TM_COOKIE_SEGURA
+        value: "1"
+    disk:
+      name: datos-sqlite
+      mountPath: /opt/render/project/src/database/almacen
+      sizeGB: 1
